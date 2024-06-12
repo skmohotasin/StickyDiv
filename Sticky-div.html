@@ -26,31 +26,46 @@
 </style>
 <script>
 function setupStickyFilter() {
-    const stickyFilter = document.querySelector('.collection-viewing-parameters'); /target div static attribude, class name or id,
-    const headerElement = document.querySelector('[data-section-type="header"]'); /header static attribude, class name or id,
+    const stickyFilter = document.querySelector('.collection-viewing-parameters');
+    const headerElement = document.querySelector('[data-section-type="header"]');
     const headerHeight = headerElement ? headerElement.offsetHeight : 0;
     let lastScrollTop = headerHeight;
-  
-    if (window.innerWidth <= 720) {
-        lastScrollTop = headerHeight * 2;
-    } else if (window.innerWidth <= 540) {
-        lastScrollTop = headerHeight * 3;
-    } else {
-        lastScrollTop = headerHeight * 1.5;
+    let isScrollingDown = true;
+
+    function updateThresholds() {
+        if (window.innerWidth <= 720) {
+            lastScrollTop = headerHeight * 2;
+        } else if (window.innerWidth <= 540) {
+            lastScrollTop = headerHeight * 3;
+        } else {
+            lastScrollTop = headerHeight * 1.5;
+        }
     }
 
-    window.addEventListener('scroll', () => {
+    function onScroll() {
         let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-        
-        if (scrollTop > lastScrollTop) {
+
+        if (scrollTop > lastScrollTop && isScrollingDown) {
             stickyFilter.classList.add('sticky-filter');
             stickyFilter.style.top = `${headerHeight}px`;
         } else {
             stickyFilter.classList.remove('sticky-filter');
             stickyFilter.style.top = 0;
         }
-        lastScrollTop = scrollTop <= headerHeight ? headerHeight : scrollTop;
-    }, false);
+
+        isScrollingDown = scrollTop > lastScrollTop;
+    }
+
+    document.addEventListener('scroll', onScroll, false);
+    window.addEventListener('resize', () => {
+        updateThresholds();
+        onScroll();
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+        updateThresholds();
+        onScroll();
+    });
 }
 
 document.addEventListener("DOMContentLoaded", () => {
