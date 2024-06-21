@@ -1,26 +1,29 @@
 <style>
-  .section-collection .sticky-filter {
+  .section-collection .collection-viewing-parameters {
     position: sticky;
     z-index: 99;
+    top: 88px;
     background-color: #fff;
+  }
+  .section-collection .sticky-filter {
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.12);
     transition: box-shadow 300ms ease-in-out 0s;
     width: calc(100vw - (100vw - 100% - var(--gutter-large) * 2));
     margin-left: calc(var(--gutter-large)* -1);
-    padding: 0 calc(var(--gutter-large)* 1);
+    padding: 0px calc(var(--gutter-large)* 1);
   }
   @media (max-width: 720px) {
     .section-collection .sticky-filter {
       width: calc(100vw - (100vw - 100% - var(--gutter-medium) * 2));
       margin-left: calc(var(--gutter-medium)* -1);
-      padding: 0 calc(var(--gutter-medium)* 1);
+      padding: 0px calc(var(--gutter-medium)* 1);
     }
   }
   @media (max-width: 540px) {
     .section-collection .sticky-filter {
       width: calc(100vw - (100vw - 100% - var(--gutter-small) * 2));
       margin-left: calc(var(--gutter-small)* -1);
-      padding: 0 calc(var(--gutter-small)* 1);
+      padding: 0px calc(var(--gutter-small)* 1);
     }
   }
 </style>
@@ -28,29 +31,26 @@
 function setupStickyFilter() {
     const stickyFilter = document.querySelector('.collection-viewing-parameters');
     const headerElement = document.querySelector('[data-section-type="header"]');
-    const headerHeight = headerElement ? headerElement.offsetHeight : 0;
+    let headerHeight = headerElement ? headerElement.offsetHeight : 0;
     let lastScrollTop = headerHeight;
     let isScrollingDown = true;
-
-    function updateThresholds() {
-        if (window.innerWidth <= 720) {
-            lastScrollTop = headerHeight * 2;
-        } else if (window.innerWidth <= 540) {
-            lastScrollTop = headerHeight * 3;
-        } else {
-            lastScrollTop = headerHeight * 1.5;
-        }
-    }
-
+  
     function onScroll() {
+        headerHeight = headerElement.offsetHeight - 1;
+        stickyFilter.style.top = `${headerHeight}px`;
         let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
 
+        if (window.innerWidth <= 540) {
+            lastScrollTop = headerHeight * 4;
+        } else if (window.innerWidth <= 720) {
+            lastScrollTop = headerHeight * 4;
+        } else {
+            lastScrollTop = headerHeight * 3;
+        }
         if (scrollTop > lastScrollTop && isScrollingDown) {
             stickyFilter.classList.add('sticky-filter');
-            stickyFilter.style.top = `${headerHeight}px`;
         } else {
             stickyFilter.classList.remove('sticky-filter');
-            stickyFilter.style.top = 0;
         }
 
         isScrollingDown = scrollTop > lastScrollTop;
@@ -58,12 +58,6 @@ function setupStickyFilter() {
 
     document.addEventListener('scroll', onScroll, false);
     window.addEventListener('resize', () => {
-        updateThresholds();
-        onScroll();
-    });
-
-    document.addEventListener('DOMContentLoaded', () => {
-        updateThresholds();
         onScroll();
     });
 }
@@ -72,7 +66,4 @@ document.addEventListener("DOMContentLoaded", () => {
     setupStickyFilter();
 });
 
-window.addEventListener('resize', () => {
-    setupStickyFilter();
-});
 </script>
